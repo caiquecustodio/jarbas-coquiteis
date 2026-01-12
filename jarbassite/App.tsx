@@ -15,16 +15,138 @@ import {
   Wine, 
   CheckCircle2, 
   ArrowRight,
-  Clock,
   Layout,
   Star,
-  Zap
+  Zap,
+  MapPin,
+  Calendar,
+  Users,
+  PartyPopper,
+  User,
+  Send
 } from 'lucide-react';
 import { IMAGES, CONTACT } from './constants';
+
+const TypewriterText: React.FC<{ text: string }> = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayedText(text.slice(0, i));
+      i++;
+      if (i > text.length) clearInterval(interval);
+    }, 50);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return <span>{displayedText}</span>;
+};
+
+const BudgetModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    nome: '',
+    local: '',
+    pessoas: '',
+    evento: '',
+    data: ''
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = `Olá Jarbas! Gostaria de um orçamento:%0A%0A*Nome:* ${formData.nome}%0A*Local:* ${formData.local}%0A*Qtd. Pessoas:* ${formData.pessoas}%0A*Tipo de Evento:* ${formData.evento}%0A*Data:* ${formData.data}`;
+    window.open(`https://wa.me/5585986054657?text=${message}`, '_blank');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative bg-[#111] border border-gold/30 w-full max-w-lg rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.2)] animate-in fade-in zoom-in duration-300">
+        <div className="bg-gold p-6 flex justify-between items-center">
+          <h3 className="text-black font-serif text-2xl font-bold">Solicitar Orçamento</h3>
+          <button onClick={onClose} className="text-black hover:scale-110 transition-transform"><X /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-5">
+          <div className="space-y-2">
+            <label className="text-gold text-xs font-bold tracking-widest flex items-center gap-2"><User size={14}/> NOME COMPLETO</label>
+            <input 
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none transition-all"
+              placeholder="Como podemos te chamar?"
+              value={formData.nome}
+              onChange={e => setFormData({...formData, nome: e.target.value})}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="text-gold text-xs font-bold tracking-widest flex items-center gap-2"><MapPin size={14}/> LOCAL DO EVENTO</label>
+              <input 
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none transition-all"
+                placeholder="Ex: Fortaleza - CE"
+                value={formData.local}
+                onChange={e => setFormData({...formData, local: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-gold text-xs font-bold tracking-widest flex items-center gap-2"><Users size={14}/> QTD. PESSOAS</label>
+              <input 
+                required
+                type="number"
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none transition-all"
+                placeholder="Ex: 100"
+                value={formData.pessoas}
+                onChange={e => setFormData({...formData, pessoas: e.target.value})}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="text-gold text-xs font-bold tracking-widest flex items-center gap-2"><PartyPopper size={14}/> TIPO DE EVENTO</label>
+              <select 
+                required
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none transition-all appearance-none"
+                value={formData.evento}
+                onChange={e => setFormData({...formData, evento: e.target.value})}
+              >
+                <option value="" disabled className="bg-black">Selecione...</option>
+                <option value="Casamento" className="bg-black">Casamento</option>
+                <option value="Aniversário" className="bg-black">Aniversário</option>
+                <option value="15 Anos" className="bg-black">15 Anos</option>
+                <option value="Corporativo" className="bg-black">Corporativo</option>
+                <option value="Outro" className="bg-black">Outro</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-gold text-xs font-bold tracking-widest flex items-center gap-2"><Calendar size={14}/> DATA PREVISTA</label>
+              <input 
+                required
+                type="date"
+                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none transition-all"
+                value={formData.data}
+                onChange={e => setFormData({...formData, data: e.target.value})}
+              />
+            </div>
+          </div>
+          <button 
+            type="submit"
+            className="w-full bg-gold text-black font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-amber-400 hover:scale-[1.02] transition-all mt-4"
+          >
+            ENVIAR PARA O WHATSAPP <Send size={18} />
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,14 +156,21 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const openBudget = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] overflow-x-hidden" data-developer="Caique Custodio - C&C Craft">
+      <BudgetModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md py-4 shadow-xl' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src={IMAGES.LOGO} alt="Jarbas Coquetéis Logo" className="h-12 w-12 rounded-full border border-gold object-cover" />
-            <span className="font-serif text-xl tracking-widest text-white hidden sm:block">JARBAS COQUETÉIS</span>
+            <span className="font-serif text-xl tracking-widest text-white hidden sm:block uppercase">JARBAS COQUETÉIS</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-widest text-gray-300">
@@ -49,13 +178,12 @@ const App: React.FC = () => {
             <a href="#servicos" className="hover:text-gold transition-colors">SERVIÇOS</a>
             <a href="#diferenciais" className="hover:text-gold transition-colors">DIFERENCIAIS</a>
             <a href="#galeria" className="hover:text-gold transition-colors">GALERIA</a>
-            <a 
-              href={CONTACT.WHATSAPP_LINK} 
-              target="_blank" 
+            <button 
+              onClick={openBudget}
               className="px-6 py-2 bg-gold text-black rounded-full hover:bg-amber-400 transition-all font-bold"
             >
               ORÇAMENTO
-            </a>
+            </button>
           </div>
 
           <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -70,55 +198,44 @@ const App: React.FC = () => {
             <a href="#servicos" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif text-white hover:text-gold">SERVIÇOS</a>
             <a href="#diferenciais" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif text-white hover:text-gold">DIFERENCIAIS</a>
             <a href="#galeria" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif text-white hover:text-gold">GALERIA</a>
-            <a href={CONTACT.INSTAGRAM_LINK} target="_blank" className="flex items-center gap-2 text-gold">
-              <Instagram size={20} /> Instagram
-            </a>
+            <button onClick={openBudget} className="text-xl font-serif text-gold text-left">SOLICITAR ORÇAMENTO</button>
           </div>
         )}
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen w-full flex items-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-[10s] scale-105 hover:scale-100" 
           style={{ backgroundImage: `url('${IMAGES.HERO}')` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
         </div>
 
-        <div className="relative z-10 text-center px-6 max-w-4xl fade-in">
-          <img 
-            src={IMAGES.LOGO} 
-            alt="Logo Central" 
-            className="w-32 h-32 md:w-48 md:h-48 mx-auto rounded-full border-2 border-gold mb-12 shadow-[0_0_50px_rgba(212,175,55,0.3)]"
-          />
-          <h1 className="text-4xl md:text-7xl font-serif text-white mb-6 leading-tight italic">
-            Drinks que transformam eventos em <span className="text-gold">experiências inesquecíveis</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light tracking-wide">
-            Serviço profissional de coquetelaria em {CONTACT.LOCATION}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a 
-              href={CONTACT.WHATSAPP_LINK}
-              target="_blank"
-              className="w-full sm:w-auto px-8 py-4 bg-gold text-black font-bold rounded-full flex items-center justify-center gap-3 hover:bg-amber-400 hover-gold transition-all"
-            >
-              <MessageCircle size={20} /> SOLICITAR ORÇAMENTO
-            </a>
-            <a 
-              href={CONTACT.INSTAGRAM_LINK}
-              target="_blank"
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold rounded-full flex items-center justify-center gap-3 hover:bg-white/20 transition-all"
-            >
-              <Instagram size={20} /> VER INSTAGRAM
-            </a>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-2">
-            <div className="w-1 h-2 bg-gold rounded-full"></div>
+        <div className="container mx-auto px-6 relative z-10 fade-in">
+          <div className="max-w-4xl text-left">
+            <h1 className="text-5xl md:text-8xl font-serif text-white mb-6 leading-tight font-bold italic tracking-tight min-h-[1.2em]">
+              <TypewriterText text="Drinks que transformam eventos em experiências inesquecíveis" />
+            </h1>
+            <p className="text-lg md:text-2xl text-gray-300 mb-10 font-light tracking-wide flex items-center gap-2">
+              <MapPin className="text-gold" size={24} />
+              Serviço profissional de coquetelaria em {CONTACT.LOCATION}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <button 
+                onClick={openBudget}
+                className="w-full sm:w-auto px-10 py-5 bg-gold text-black font-bold rounded-full flex items-center justify-center gap-3 hover:bg-amber-400 hover-gold transition-all text-lg"
+              >
+                <MessageCircle size={22} /> SOLICITAR ORÇAMENTO
+              </button>
+              <a 
+                href={CONTACT.INSTAGRAM_LINK}
+                target="_blank"
+                className="w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold rounded-full flex items-center justify-center gap-3 hover:bg-white/20 transition-all text-lg"
+              >
+                <Instagram size={22} /> VER PORTFÓLIO
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -231,12 +348,12 @@ const App: React.FC = () => {
             <p className="text-gray-300 text-xl leading-relaxed mb-10 italic">
               "Mais do que drinks, entregamos uma experiência ao vivo que encanta e envolve seus convidados, transformando o bar no coração do evento."
             </p>
-            <a 
-              href={CONTACT.WHATSAPP_LINK}
+            <button 
+              onClick={openBudget}
               className="inline-flex items-center gap-4 text-gold font-bold text-lg hover:translate-x-2 transition-transform"
             >
-              SAIBA MAIS <ArrowRight />
-            </a>
+              SOLICITAR ORÇAMENTO AGORA <ArrowRight />
+            </button>
           </div>
         </div>
       </section>
@@ -260,44 +377,6 @@ const App: React.FC = () => {
                 <DifferentialItem text="Ingredientes frescos e selecionados a dedo" />
                 <DifferentialItem text="Insumos de marcas premium consagradas" />
               </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Works */}
-      <section className="py-24 bg-black overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-gold font-bold tracking-[0.3em] text-xs uppercase mb-4">PROCESSO</h2>
-            <h3 className="text-4xl font-serif text-white italic">Como Criamos sua Festa</h3>
-          </div>
-
-          <div className="relative">
-            {/* Desktop Line */}
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-white/10 hidden md:block"></div>
-            
-            <div className="grid md:grid-cols-4 gap-8 relative z-10">
-              <StepItem 
-                number="01" 
-                title="Contato" 
-                desc="Conversamos via WhatsApp para entender seu estilo e necessidade."
-              />
-              <StepItem 
-                number="02" 
-                title="Planejamento" 
-                desc="Montamos o cardápio ideal baseado no seu perfil e convidados."
-              />
-              <StepItem 
-                number="03" 
-                title="Montagem" 
-                desc="Chegamos com antecedência para preparar toda a estrutura de bar."
-              />
-              <StepItem 
-                number="04" 
-                title="Evento" 
-                desc="Atendimento premium ao vivo para que você só se preocupe em curtir."
-              />
             </div>
           </div>
         </div>
@@ -355,14 +434,15 @@ const App: React.FC = () => {
             Leve sofisticação e sabor <br /> <span className="italic">para o seu próximo evento</span>
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a 
-              href={CONTACT.WHATSAPP_LINK}
+            <button 
+              onClick={openBudget}
               className="w-full sm:w-auto px-10 py-5 bg-black text-white font-bold rounded-full hover:bg-gray-900 transition-all flex items-center justify-center gap-3 shadow-2xl"
             >
               <MessageCircle /> SOLICITAR ORÇAMENTO
-            </a>
+            </button>
             <a 
               href={CONTACT.INSTAGRAM_LINK}
+              target="_blank"
               className="w-full sm:w-auto px-10 py-5 bg-transparent border-2 border-black text-black font-bold rounded-full hover:bg-black hover:text-white transition-all flex items-center justify-center gap-3"
             >
               <Instagram /> NOSSO INSTAGRAM
@@ -392,7 +472,7 @@ const App: React.FC = () => {
                 <a href={CONTACT.INSTAGRAM_LINK} target="_blank" className="text-gray-300 hover:text-gold transition-colors">
                   <Instagram />
                 </a>
-                <a href={CONTACT.WHATSAPP_LINK} target="_blank" className="text-gray-300 hover:text-gold transition-colors">
+                <a onClick={openBudget} className="text-gray-300 hover:text-gold transition-colors cursor-pointer">
                   <MessageCircle />
                 </a>
               </div>
@@ -400,7 +480,6 @@ const App: React.FC = () => {
           </div>
           <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-600 text-sm">© {new Date().getFullYear()} Jarbas Coquetéis. Todos os direitos reservados.</p>
-            {/* Assinatura subliminar no código do footer */}
             <p className="text-gray-600 text-xs opacity-50 select-none cursor-default" title="Feito por Caique Custodio - C&C Craft">
               Premium Experience Craftsmanship
             </p>
@@ -409,13 +488,12 @@ const App: React.FC = () => {
       </footer>
 
       {/* Floating WhatsApp */}
-      <a 
-        href={CONTACT.WHATSAPP_LINK}
-        target="_blank"
+      <button 
+        onClick={openBudget}
         className="fixed bottom-8 right-8 z-[100] bg-green-500 text-white p-4 rounded-full shadow-[0_10px_30px_rgba(34,197,94,0.4)] hover:scale-110 active:scale-95 transition-all animate-pulse"
       >
         <MessageCircle size={32} />
-      </a>
+      </button>
     </div>
   );
 };
@@ -434,18 +512,6 @@ const DifferentialItem: React.FC<{ text: string }> = ({ text }) => (
     <div className="w-2 h-2 rounded-full bg-gold group-hover:scale-150 transition-all"></div>
     <span className="text-gray-300 text-lg group-hover:text-white transition-colors">{text}</span>
   </li>
-);
-
-const StepItem: React.FC<{ number: string, title: string, desc: string }> = ({ number, title, desc }) => (
-  <div className="relative group text-center md:text-left">
-    <div className="mb-6 flex justify-center md:justify-start">
-      <div className="w-16 h-16 bg-gold text-black rounded-full flex items-center justify-center font-serif text-2xl italic border-4 border-black group-hover:bg-amber-400 transition-colors z-10">
-        {number}
-      </div>
-    </div>
-    <h4 className="text-white font-serif text-xl mb-3">{title}</h4>
-    <p className="text-gray-500 text-sm">{desc}</p>
-  </div>
 );
 
 /**
