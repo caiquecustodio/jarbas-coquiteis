@@ -36,11 +36,20 @@ const TypewriterText: React.FC<{ text: string }> = ({ text }) => {
       setDisplayedText(text.slice(0, i));
       i++;
       if (i > text.length) clearInterval(interval);
-    }, 50);
+    }, 40);
     return () => clearInterval(interval);
   }, [text]);
 
-  return <span>{displayedText}</span>;
+  return (
+    <span className="inline-block transition-all duration-700">
+      {displayedText.split('').map((char, index) => (
+        <span key={index} className="animate-in fade-in duration-500 fill-mode-both">
+          {char}
+        </span>
+      ))}
+      <span className="inline-block w-[2px] h-[1em] bg-gold ml-1 animate-pulse align-middle"></span>
+    </span>
+  );
 };
 
 const BudgetModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
@@ -206,34 +215,34 @@ const App: React.FC = () => {
       {/* Hero Section */}
       <section className="relative h-screen w-full flex items-center overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-[10s] scale-105 hover:scale-100" 
+          className="absolute inset-0 bg-cover bg-[center_top_35%] transition-transform duration-[10s] scale-105 hover:scale-100" 
           style={{ backgroundImage: `url('${IMAGES.HERO}')` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/40 to-transparent"></div>
         </div>
 
-        <div className="container mx-auto px-6 relative z-10 fade-in">
-          <div className="max-w-4xl text-left">
-            <h1 className="text-5xl md:text-8xl font-serif text-white mb-6 leading-tight font-bold italic tracking-tight min-h-[1.2em]">
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-2xl text-left fade-in">
+            <h1 className="text-lg md:text-xl font-medium tracking-[0.2em] uppercase text-white mb-6 min-h-[1.5em] flex items-center">
               <TypewriterText text="Drinks que transformam eventos em experiências inesquecíveis" />
             </h1>
-            <p className="text-lg md:text-2xl text-gray-300 mb-10 font-light tracking-wide flex items-center gap-2">
-              <MapPin className="text-gold" size={24} />
-              Serviço profissional de coquetelaria em {CONTACT.LOCATION}
+            <p className="text-sm md:text-base text-gray-400 mb-8 font-light tracking-[0.1em] flex items-center gap-2 uppercase">
+              <MapPin className="text-gold" size={16} />
+              Serviço de coquetelaria em {CONTACT.LOCATION}
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <button 
                 onClick={openBudget}
-                className="w-full sm:w-auto px-10 py-5 bg-gold text-black font-bold rounded-full flex items-center justify-center gap-3 hover:bg-amber-400 hover-gold transition-all text-lg"
+                className="w-full sm:w-auto px-8 py-4 bg-gold text-black text-xs font-bold tracking-widest rounded-full hover:bg-amber-400 transition-all shadow-lg"
               >
-                <MessageCircle size={22} /> SOLICITAR ORÇAMENTO
+                SOLICITAR ORÇAMENTO
               </button>
               <a 
                 href={CONTACT.INSTAGRAM_LINK}
                 target="_blank"
-                className="w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold rounded-full flex items-center justify-center gap-3 hover:bg-white/20 transition-all text-lg"
+                className="w-full sm:w-auto px-8 py-4 bg-white/5 border border-white/10 text-white text-xs font-bold tracking-widest rounded-full hover:bg-white/10 transition-all"
               >
-                <Instagram size={22} /> VER PORTFÓLIO
+                VER PORTFÓLIO
               </a>
             </div>
           </div>
@@ -334,123 +343,6 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Live Experience Section */}
-      <section className="relative py-32 flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={IMAGES.BARTENDER} alt="Bartender working" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-2xl">
-            <h2 className="text-gold font-bold tracking-[0.3em] text-xs uppercase mb-4">EXPERIÊNCIA AO VIVO</h2>
-            <h3 className="text-4xl md:text-6xl font-serif text-white mb-8">A arte de servir que encanta convidados</h3>
-            <p className="text-gray-300 text-xl leading-relaxed mb-10 italic">
-              "Mais do que drinks, entregamos uma experiência ao vivo que encanta e envolve seus convidados, transformando o bar no coração do evento."
-            </p>
-            <button 
-              onClick={openBudget}
-              className="inline-flex items-center gap-4 text-gold font-bold text-lg hover:translate-x-2 transition-transform"
-            >
-              SOLICITAR ORÇAMENTO AGORA <ArrowRight />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Differentials */}
-      <section id="diferenciais" className="py-24 bg-[#0a0a0a]">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="relative h-[500px] overflow-hidden rounded-2xl">
-              <img src={IMAGES.GLASSES} alt="Taças elegantes" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/20"></div>
-            </div>
-            <div>
-              <h2 className="text-gold font-bold tracking-[0.3em] text-xs uppercase mb-4">DIFERENCIAIS</h2>
-              <h3 className="text-4xl font-serif text-white mb-8">O segredo está nos detalhes</h3>
-              <ul className="space-y-6">
-                <DifferentialItem text="Atendimento profissional e carismático" />
-                <DifferentialItem text="Drinks preparados na hora com técnica apurada" />
-                <DifferentialItem text="Estrutura completa de bar personalizada" />
-                <DifferentialItem text="Visual sofisticado para harmonizar com o décor" />
-                <DifferentialItem text="Ingredientes frescos e selecionados a dedo" />
-                <DifferentialItem text="Insumos de marcas premium consagradas" />
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery Section */}
-      <section id="galeria" className="py-24 bg-[#050505]">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-gold font-bold tracking-[0.3em] text-xs uppercase mb-4">GALERIA DE EVENTOS</h2>
-              <h3 className="text-4xl md:text-5xl font-serif text-white italic">Eventos que Marcaram Época</h3>
-            </div>
-            <a href={CONTACT.INSTAGRAM_LINK} target="_blank" className="flex items-center gap-2 text-gold font-bold">
-              VER MAIS NO INSTAGRAM <ArrowRight size={18} />
-            </a>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 group relative overflow-hidden rounded-2xl h-[400px]">
-              <img src={IMAGES.EVENT_ANTARES} alt="Evento Antares" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                <p className="text-white font-serif text-2xl italic">Evento Exclusivo - Antares</p>
-              </div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl h-[400px]">
-              <img src={IMAGES.EVENT_BIRTHDAY} alt="Evento Aniversário" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                <p className="text-white font-serif text-2xl italic">Festa de Aniversário</p>
-              </div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl h-[400px]">
-              <img src={IMAGES.EVENT_ACTION} alt="Action Event" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                <p className="text-white font-serif text-2xl italic">Celebrando Conquistas</p>
-              </div>
-            </div>
-            <div className="md:col-span-2 group relative overflow-hidden rounded-2xl h-[400px]">
-              <img src={IMAGES.BAR_COUNTER} alt="Full Bar" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                <p className="text-white font-serif text-2xl italic">Estrutura Jarbas Coquetéis</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gold relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <img src={IMAGES.BAR_COUNTER} alt="Pattern" className="w-full h-full object-cover" />
-        </div>
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <h2 className="text-black font-serif text-4xl md:text-6xl mb-8 leading-tight">
-            Leve sofisticação e sabor <br /> <span className="italic">para o seu próximo evento</span>
-          </h2>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <button 
-              onClick={openBudget}
-              className="w-full sm:w-auto px-10 py-5 bg-black text-white font-bold rounded-full hover:bg-gray-900 transition-all flex items-center justify-center gap-3 shadow-2xl"
-            >
-              <MessageCircle /> SOLICITAR ORÇAMENTO
-            </button>
-            <a 
-              href={CONTACT.INSTAGRAM_LINK}
-              target="_blank"
-              className="w-full sm:w-auto px-10 py-5 bg-transparent border-2 border-black text-black font-bold rounded-full hover:bg-black hover:text-white transition-all flex items-center justify-center gap-3"
-            >
-              <Instagram /> NOSSO INSTAGRAM
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="py-16 bg-[#020202] border-t border-white/5">
         <div className="container mx-auto px-6">
@@ -514,7 +406,4 @@ const DifferentialItem: React.FC<{ text: string }> = ({ text }) => (
   </li>
 );
 
-/**
- * Crafted with passion by Caique Custodio - C&C Craft
- */
 export default App;
